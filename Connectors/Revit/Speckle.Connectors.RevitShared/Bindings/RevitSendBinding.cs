@@ -284,10 +284,19 @@ internal sealed class RevitSendBinding : RevitBaseBinding, ISendBinding
           continue;
         }
 
-        // transform maps linked model elements into the main model's reference point coordinate system
-        // first apply the user's reference point transform (setting) then adjust for the linked model's placement relative to host.
-        Transform transform = (mainModelTransform ?? Transform.Identity).Multiply(
-          linkedModel.GetTotalTransform().Inverse
+        // transform maps linked model elements into the main model's reference point coordinate system.
+        // The converters use its INVERSE as "document -> world" (DisplayValueExtractor, ReferencePointConverter),
+        // so for a linked element the inverse must be M^-1 * L: first place it in the host (L = the link's total
+        // transform), then into the reference point's system (M^-1). That makes this L^-1 * M.
+        // BIM Cost: upstream composed it as M * L^-1, whose inverse is L * M^-1 - the reference point applied
+        // BEFORE the link. The two agree when L is the identity (a link sitting on the host's own coordinates)
+        // or when M is (Internal Origin), which is why most links published correctly. A link placed with a
+        // rotation in the host (PEPSICO-TOLSMA-1227's site model, 4.611 deg, published with Shared Coordinates)
+        // landed ~493 km away: its translation came out rotated by that angle about the shared-coordinate
+        // origin. With M = identity both orders are L^-1, so Internal Origin publishes and the link-instance
+        // hash match in LinkedModelHandler are unchanged.
+        Transform transform = linkedModel.GetTotalTransform().Inverse.Multiply(
+          mainModelTransform ?? Transform.Identity
         );
 
         // decision about whether to process elements is made here, not in the handler
