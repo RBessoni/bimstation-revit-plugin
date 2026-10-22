@@ -203,7 +203,7 @@ internal sealed class RevitSendBinding : RevitBaseBinding, ISendBinding
 
     await _threadContext.RunOnMainAsync(() =>
     {
-      using var transaction = new Transaction(document, "Speckle Parameter Updates");
+      using var transaction = new Transaction(document, "BIM Station Parameter Updates");
       transaction.Start();
 
       foreach (var change in changes)
@@ -288,7 +288,7 @@ internal sealed class RevitSendBinding : RevitBaseBinding, ISendBinding
         // The converters use its INVERSE as "document -> world" (DisplayValueExtractor, ReferencePointConverter),
         // so for a linked element the inverse must be M^-1 * L: first place it in the host (L = the link's total
         // transform), then into the reference point's system (M^-1). That makes this L^-1 * M.
-        // BIM Cost: upstream composed it as M * L^-1, whose inverse is L * M^-1 - the reference point applied
+        // BIM Station: upstream composed it as M * L^-1, whose inverse is L * M^-1 - the reference point applied
         // BEFORE the link. The two agree when L is the identity (a link sitting on the host's own coordinates)
         // or when M is (Internal Origin), which is why most links published correctly. A link placed with a
         // rotation in the host (PEPSICO-TOLSMA-1227's site model, 4.611 deg, published with Shared Coordinates)

@@ -12,7 +12,7 @@ namespace Speckle.Connectors.Revit.Plugin;
 
 public sealed partial class RevitControlWebView : UserControl, IBrowserScriptExecutor, IDisposable
 {
-  private const string UI_VIRTUAL_HOST = "bimcost.app";
+  private const string UI_VIRTUAL_HOST = "bimstation-panel.example";
 
   private readonly IServiceProvider _serviceProvider;
 #pragma warning disable CA2213

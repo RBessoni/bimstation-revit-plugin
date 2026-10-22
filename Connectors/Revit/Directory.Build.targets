@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
+  <!--
+    BIM Station installs into its own Addins folder and manifest (BIMStation.Revit<ver>) rather
+    than upstream's Speckle.Connectors.Revit<ver>, so it never overwrites an installed official
+    Speckle connector. The assemblies keep their Speckle.* names; only the install location moves.
+  -->
+  <PropertyGroup Condition="'$(RevitVersion)' != ''">
+    <BimStationAddinName>BIMStation.Revit$(RevitVersion)</BimStationAddinName>
+    <BimStationAddinsDir>$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)</BimStationAddinsDir>
+  </PropertyGroup>
+
   <Target
     AfterTargets="Clean"
     Name="CleanAddinsRevit"
     Condition="'$(RevitVersion)' != '' And '$(ContinuousIntegrationBuild)' != 'true' And '$(OS)' == 'Windows_NT'"
   >
-    <RemoveDir Directories="$(TargetDir);$(ProjectDir)\..\Release\Release$(RevitVersion);$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\Speckle.Connectors.Revit$(RevitVersion);" />
-    <Delete Files="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\Speckle.Connectors.Revit$(RevitVersion).addin" />
+    <RemoveDir Directories="$(TargetDir);$(ProjectDir)\..\Release\Release$(RevitVersion);$(BimStationAddinsDir)\$(BimStationAddinName);" />
+    <Delete Files="$(BimStationAddinsDir)\$(BimStationAddinName).addin" />
   </Target>
 
   <Target
@@ -15,35 +25,37 @@
     Condition="'$(RevitVersion)' != '' And '$(ContinuousIntegrationBuild)' != 'true' And '$(OS)' == 'Windows_NT'"
   >
     <!--
-      Stage the BIM Cost panel UI into $(TargetDir)\ui so the copy below carries it into the
+      Stage the BIM Station panel UI into $(TargetDir)\ui so the copy below carries it into the
       Revit Addins folder. RevitControlWebView serves that folder over a WebView2 virtual host.
       Produced by `yarn generate` in the sibling speckle-connectors-dui repo.
     -->
     <PropertyGroup>
-      <BimCostUiSource>$(MSBuildThisFileDirectory)..\..\..\speckle-connectors-dui\.output\public</BimCostUiSource>
+      <BimStationUiSource>$(MSBuildThisFileDirectory)..\..\..\speckle-connectors-dui\.output\public</BimStationUiSource>
     </PropertyGroup>
     <Warning
-      Condition="!Exists('$(BimCostUiSource)')"
-      Text="BIM Cost UI not found at $(BimCostUiSource). Run `yarn generate` in speckle-connectors-dui, or point SPECKLE_DUI_URL at a hosted UI."
+      Condition="!Exists('$(BimStationUiSource)')"
+      Text="BIM Station UI not found at $(BimStationUiSource). Run `yarn generate` in speckle-connectors-dui, or point SPECKLE_DUI_URL at a hosted UI."
     />
-    <ItemGroup Condition="Exists('$(BimCostUiSource)')">
-      <BimCostUiFiles Include="$(BimCostUiSource)\**\*.*" />
+    <ItemGroup Condition="Exists('$(BimStationUiSource)')">
+      <BimStationUiFiles Include="$(BimStationUiSource)\**\*.*" />
     </ItemGroup>
     <Copy
-      Condition="Exists('$(BimCostUiSource)')"
+      Condition="Exists('$(BimStationUiSource)')"
       DestinationFolder="$(TargetDir)\ui\%(RecursiveDir)"
-      SourceFiles="@(BimCostUiFiles)"
+      SourceFiles="@(BimStationUiFiles)"
     />
 
     <ItemGroup>
       <RevitDLLs Include="$(TargetDir)\**\*.*" Exclude="$(TargetDir)*.addin" />
-      <SourceManifest Include="$(TargetDir)\Plugin\Speckle.Connectors.Revit$(RevitVersion).addin" />
     </ItemGroup>
     <Message Text="Revit Version $(RevitVersion)" Importance="high" />
     <Copy
-      DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\$(RevitVersion)\Speckle.Connectors.Revit$(RevitVersion)\%(RecursiveDir)"
+      DestinationFolder="$(BimStationAddinsDir)\$(BimStationAddinName)\%(RecursiveDir)"
       SourceFiles="@(RevitDLLs)"
     />
-    <Copy DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\$(RevitVersion)\" SourceFiles="@(SourceManifest)" />
+    <Copy
+      SourceFiles="$(TargetDir)\Plugin\Speckle.Connectors.Revit$(RevitVersion).addin"
+      DestinationFiles="$(BimStationAddinsDir)\$(BimStationAddinName).addin"
+    />
   </Target>
 </Project>

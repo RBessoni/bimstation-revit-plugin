@@ -74,7 +74,7 @@ public class RevitParameterCreator
     var defFile = app.OpenSharedParameterFile();
     if (defFile is null)
     {
-      return UpdateResult.Fail("Could not open or create the Speckle shared parameter file");
+      return UpdateResult.Fail("Could not open or create the BIM Station shared parameter file");
     }
 
     var definition = GetOrCreateDefinition(defFile, paramName);

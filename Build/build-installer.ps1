@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Builds the BIM Cost for Revit installer end to end.
+  Builds the BIM Station for Revit installer end to end.
 
 .DESCRIPTION
   Runs the whole pipeline in the order it has to happen:
@@ -11,7 +11,7 @@
   The UI must be generated first, because the installer embeds its output.
 
 .PARAMETER Version
-  Version stamped into the installer. Defaults to whatever BIMCostForRevit.iss declares.
+  Version stamped into the installer. Defaults to whatever BIMStationForRevit.iss declares.
 
 .PARAMETER SkipUi
   Reuse the existing UI bundle instead of regenerating it. Much faster when only C# changed.
@@ -30,7 +30,7 @@ $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $uiRepo = Join-Path (Split-Path -Parent $repoRoot) 'speckle-connectors-dui'
-$issPath = Join-Path $PSScriptRoot 'installer\BIMCostForRevit.iss'
+$issPath = Join-Path $PSScriptRoot 'installer\BIMStationForRevit.iss'
 
 function Assert-Tool($name, $probe, $hint) {
   if (-not (& $probe)) { throw "$name not found. $hint" }

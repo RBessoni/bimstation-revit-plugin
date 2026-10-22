@@ -50,7 +50,7 @@ public class GlobalConfigResolver(ILogger<IGlobalConfigResolver> logger) : IGlob
       logger.LogWarning("Failed to parse {Key} '{Value}'", KEY, value);
     }
 
-    return new Uri("https://bimcost.app/index.html", UriKind.Absolute);
+    return new Uri("https://bimstation-panel.example/index.html", UriKind.Absolute);
   }
 
   public bool GetIsUpdateNotificationDisabled()

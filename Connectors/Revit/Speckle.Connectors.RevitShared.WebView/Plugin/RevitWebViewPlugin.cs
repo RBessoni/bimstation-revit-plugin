@@ -41,7 +41,7 @@ internal sealed class RevitWebViewPlugin(
     }
     catch (ArgumentException)
     {
-      // exception occurs when the speckle tab has already been created.
+      // exception occurs when the tab has already been created.
       // this happens when both the dui2 and the dui3 connectors are installed. Can be safely ignored.
     }
 
@@ -49,7 +49,7 @@ internal sealed class RevitWebViewPlugin(
     var dui3Button = (PushButton)
       specklePanel.AddItem(
         new PushButtonData(
-          "BIM Cost for Revit",
+          "BIM Station for Revit",
           Connector.TabTitle,
           typeof(RevitExternalApplication).Assembly.Location,
           typeof(SpeckleRevitCommand).FullName
@@ -69,9 +69,9 @@ internal sealed class RevitWebViewPlugin(
       $"Speckle.Connectors.Revit{speckleApplication.HostApplicationVersion}.Assets.logo32.png",
       path
     );
-    dui3Button.ToolTip = "BIM Cost for Revit";
+    dui3Button.ToolTip = "BIM Station for Revit";
     //dui3Button.AvailabilityClassName = typeof(CmdAvailabilityViews).FullName;
-    // Contextual help omitted until BIM Cost docs have a public URL.
+    // Contextual help omitted until BIM Station docs have a public URL.
   }
 
   private void OnApplicationInitialized(object? sender, Autodesk.Revit.DB.Events.ApplicationInitializedEventArgs e)

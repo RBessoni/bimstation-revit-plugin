@@ -1,6 +1,7 @@
-# Working on BIM Cost for Revit
+# Working on BIM Station for Revit
 
-BIM Cost is a rebranded fork of Speckle's Revit connector. `BIMCOST.md` documents the
+BIM Station (released as "BIM Cost" up to 1.0.4) is a rebranded fork of Speckle's Revit
+connector. `BIMSTATION.md` documents the
 project for people; this file records what an agent needs to avoid re-learning the hard
 parts. Read both before changing anything.
 
@@ -20,7 +21,7 @@ the change belongs in `../speckle-connectors-dui`, not here. Searching this repo
 text will find nothing.
 
 The UI folder **must** be named `speckle-connectors-dui`. `Connectors/Revit/Directory.Build.targets`
-and `Build/installer/BIMCostForRevit.iss` resolve it by relative path. A plain `git clone`
+and `Build/installer/BIMStationForRevit.iss` resolve it by relative path. A plain `git clone`
 of the fork produces `costrail-connector-dui` and the build then ships an installer with no
 panel, silently and with no error.
 
@@ -75,7 +76,7 @@ Two habits that repeatedly caught real bugs:
   frames whenever the browser pane is not displayed, and the page often renders a beat
   after navigation — query once, then query again before concluding anything is broken.
 
-Production mode legitimately shows `BIM Cost plugin is not connected.` outside Revit: there
+Production mode legitimately shows `BIM Station plugin is not connected.` outside Revit: there
 are no host bindings. That is correct, not a failure. Dev mode registers mocked bindings and
 renders the full panel.
 
@@ -113,6 +114,19 @@ to be closed — the installer refuses to start otherwise.
 If they ever match upstream again, Revit conflicts when both connectors are installed and
 one fails to load. Never take upstream's values in a merge.
 
+**The install location is ours too.** Since 1.1.0 the plugin installs to
+`Addins\<ver>\BIMStation.Revit<ver>\` with manifest `BIMStation.Revit<ver>.addin`, set in
+`Directory.Build.targets` and the `.iss`; the source manifests keep upstream's file names.
+Upstream's `Speckle.Connectors.Revit<ver>` is the official connector's path, so a merge
+that restores it makes our installer overwrite Speckle. The `.addin` `<Assembly>` path must
+match the folder. Assembly names, namespaces and the embedded icon resource names
+(`Speckle.Connectors.Revit<ver>.Assets.logo16.png`) stay `Speckle.*` — renaming them breaks
+the ribbon icons silently and every upstream merge.
+
+**Shared parameters stay in the "Speckle" group.** `RevitParameterCreator` writes to
+`%AppData%\Speckle\SpeckleSharedParameters.txt`, group `Speckle`. Renaming either creates
+definitions with new GUIDs, which then clash with parameters already bound in users' projects.
+
 **Telemetry must stay out.** Upstream's Release path exports logs and traces to
 `seq.speckle.systems` with a hardcoded API key. `Sdk/Speckle.Connectors.Common/Connector.cs`
 has it removed. Check this after every upstream merge.
@@ -125,7 +139,10 @@ Speckle's Desktop Service, and `GetDefaultSpeckleServerUrl()` still falls back t
 ## Which server the plugin actually talks to
 
 **Production publishes go to Blackbird's own server**, not Speckle's:
-`https://bimcost.blackbirdindustries.com.au` — "Blackbird BIM Cost — Model Hub". It reports
+`https://bimcost.blackbirdindustries.com.au` — "BIM Station — Model Hub". Since 2026-10 that
+domain 301-redirects pages and unknown routes to the canonical `https://bimstation.app`, but
+the routes the connector uses (`/graphql`, `/api/diff`, `/objects`, `/api/getobjects`) still
+answer directly on the old domain. If it is ever retired, publishing stops. It reports
 version `2.31.14` but speaks the **v3 API** (`project` resolves, `stream` does not), so the
 connector is API-compatible with it. The Speckle URL in the config is only a default that
 the account overrides.
@@ -137,7 +154,7 @@ failures usually live. Before blaming the connector, probe it:
 curl -s -X POST -H "Content-Type: application/json" \
   -d '{"query":"{ serverInfo { version name } }"}' \
   https://bimcost.blackbirdindustries.com.au/graphql
-curl -s https://bimcost.blackbirdindustries.com.au/api/v1/data-module-enabled   # 404 = expected
+curl -s https://bimcost.blackbirdindustries.com.au/api/v1/data-module-enabled   # 301 to bimstation.app, then 404 = expected
 ```
 
 It does **not** implement the model-ingestion API (`canCreateModelIngestion` is absent) nor

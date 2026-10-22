@@ -1,15 +1,15 @@
-; BIM Cost for Revit - installer
+; BIM Station for Revit - installer
 ;
 ; Builds a single self-contained .exe that drops the connector and the bundled panel UI
 ; into the per-user Revit Addins folder. Per-user on purpose: Revit modellers should not
 ; need admin rights, and Revit reads %AppData%\Autodesk\Revit\Addins by default.
 ;
-; Build with:  ISCC.exe Build\installer\BIMCostForRevit.iss
+; Build with:  ISCC.exe Build\installer\BIMStationForRevit.iss
 ; Expects Release builds to exist and the UI to be generated (see PreBuild checks below).
 
-#define AppName "BIM Cost for Revit"
+#define AppName "BIM Station for Revit"
 #define AppPublisher "Blackbird Industries"
-#define AppVersion "1.0.2"
+#define AppVersion "1.1.0"
 
 ; Connector Release output
 #define Out2026 "..\..\Connectors\Revit\Speckle.Connectors.Revit2026\bin\Release\net8.0-windows"
@@ -17,7 +17,13 @@
 ; Static panel UI generated from the sibling speckle-connectors-dui repo
 #define UiDir "..\..\..\speckle-connectors-dui\.output\public"
 
+; Our own Addins folder and manifest name. Upstream's Speckle.Connectors.Revit<ver> is the
+; official Speckle connector's location, and installing there would overwrite it.
+#define Addin2026 "BIMStation.Revit2026"
+#define Addin2027 "BIMStation.Revit2027"
+
 [Setup]
+; Kept from the BIM Cost releases: the same AppId makes this an in-place upgrade of them.
 AppId={{b01889a6-e55c-437a-8d34-87a5f6bb633e}
 AppName={#AppName}
 AppVersion={#AppVersion}
@@ -28,7 +34,7 @@ DisableDirPage=yes
 DisableProgramGroupPage=yes
 UninstallDisplayName={#AppName}
 OutputDir=..\..\output
-OutputBaseFilename=BIMCostForRevit-{#AppVersion}-Setup
+OutputBaseFilename=BIMStationForRevit-{#AppVersion}-Setup
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
@@ -50,31 +56,66 @@ Name: "r2027"; Description: "Revit 2027"; Types: custom; Check: RevitInstalled('
 
 [Files]
 ; --- Revit 2026 ---
-Source: "{#Out2026}\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2026\Speckle.Connectors.Revit2026"; \
+Source: "{#Out2026}\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2026\{#Addin2026}"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: r2026
-Source: "{#UiDir}\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2026\Speckle.Connectors.Revit2026\ui"; \
+Source: "{#UiDir}\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2026\{#Addin2026}\ui"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: r2026
 Source: "{#Out2026}\Plugin\Speckle.Connectors.Revit2026.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2026"; \
-  Flags: ignoreversion; Components: r2026
+  DestName: "{#Addin2026}.addin"; Flags: ignoreversion; Components: r2026
 
 ; --- Revit 2027 ---
-Source: "{#Out2027}\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2027\Speckle.Connectors.Revit2027"; \
+Source: "{#Out2027}\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2027\{#Addin2027}"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: r2027
-Source: "{#UiDir}\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2027\Speckle.Connectors.Revit2027\ui"; \
+Source: "{#UiDir}\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2027\{#Addin2027}\ui"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: r2027
 Source: "{#Out2027}\Plugin\Speckle.Connectors.Revit2027.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2027"; \
-  Flags: ignoreversion; Components: r2027
+  DestName: "{#Addin2027}.addin"; Flags: ignoreversion; Components: r2027
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{userappdata}\Autodesk\Revit\Addins\2026\Speckle.Connectors.Revit2026"
-Type: filesandordirs; Name: "{userappdata}\Autodesk\Revit\Addins\2027\Speckle.Connectors.Revit2027"
+Type: filesandordirs; Name: "{userappdata}\Autodesk\Revit\Addins\2026\{#Addin2026}"
+Type: filesandordirs; Name: "{userappdata}\Autodesk\Revit\Addins\2027\{#Addin2027}"
 
 [Code]
+const
+  { The addin ClientId every BIM Cost / BIM Station manifest carries. }
+  OurClientId = '8ae12a74-b713-4fe8-8183-8d10099a88ef';
+
 { Revit is detected by its install directory rather than the registry: the registry layout
   varies between Autodesk releases, the folder does not. }
 function RevitInstalled(Version: String): Boolean;
 begin
   Result := DirExists(ExpandConstant('{commonpf}\Autodesk\Revit ') + Version);
+end;
+
+{ BIM Cost releases (1.0.x) installed into upstream's Speckle.Connectors.Revit<ver> folder.
+  Left in place after the upgrade, that manifest would load next to the new one with the same
+  ClientId and Revit would refuse one of them. The folder is removed only when its manifest is
+  ours: the same path may hold the official Speckle connector, which must not be touched. }
+procedure RemoveLegacyBimCostInstall(Version: String);
+var
+  AddinsDir, Manifest: String;
+  Content: AnsiString;
+begin
+  AddinsDir := ExpandConstant('{userappdata}\Autodesk\Revit\Addins\') + Version;
+  Manifest := AddinsDir + '\Speckle.Connectors.Revit' + Version + '.addin';
+  if not FileExists(Manifest) then
+    Exit;
+  if not LoadStringFromFile(Manifest, Content) then
+    Exit;
+  if Pos(OurClientId, Lowercase(String(Content))) = 0 then
+    Exit;
+
+  DelTree(AddinsDir + '\Speckle.Connectors.Revit' + Version, True, True, True);
+  DeleteFile(Manifest);
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssInstall then
+  begin
+    RemoveLegacyBimCostInstall('2026');
+    RemoveLegacyBimCostInstall('2027');
+  end;
 end;
 
 { Copying over DLLs that Revit has loaded fails mid-install and leaves a half-written addin,
@@ -126,7 +167,7 @@ begin
 
   if not IsWebView2Present then
     MsgBox('The Microsoft Edge WebView2 Runtime was not detected.' + #13#10#13#10 +
-           'BIM Cost uses it to draw its panel. Installation will continue, but if the panel ' +
+           'BIM Station uses it to draw its panel. Installation will continue, but if the panel ' +
            'appears blank inside Revit, install the WebView2 Runtime from Microsoft and restart Revit.',
            mbInformation, MB_OK);
 end;

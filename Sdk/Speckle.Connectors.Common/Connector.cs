@@ -20,8 +20,8 @@ public static class Connector
     }
   }
 
-  public static readonly string TabName = "BIM Cost";
-  public static readonly string TabTitle = "BIM Cost";
+  public static readonly string TabName = "BIM Station";
+  public static readonly string TabTitle = "BIM Station";
 
   public static IDisposable Initialize(
     this IServiceCollection serviceCollection,
@@ -46,7 +46,7 @@ public static class Connector
       new SpeckleTracing(Console: false),
       new SpeckleMetrics(Console: false)
 #else
-      // Telemetry export removed for BIM Cost builds: the upstream Release path
+      // Telemetry export removed for BIM Station builds: the upstream Release path
       // shipped logs and traces to a third-party endpoint with a hardcoded key.
       // Local console and file logging are kept.
       new SpeckleLogging(Console: true, File: new(), MinimumLevel: SpeckleLogLevel.Information),

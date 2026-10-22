@@ -1,6 +1,7 @@
-# BIM Cost for Revit
+# BIM Station for Revit
 
-Fork of Speckle's Revit connector, rebranded as the BIM Cost plugin.
+Fork of Speckle's Revit connector, rebranded as the BIM Station plugin (released as
+"BIM Cost" up to 1.0.4).
 
 This file documents what upstream's README does not: the two-repo layout, the build
 pipeline, and how to sync with Speckle without losing our changes. Kept separate from
@@ -19,7 +20,7 @@ next to each other, with these exact folder names:
 
 This repo's folder can be named anything — nothing points at it by name. The **UI folder
 must be called `speckle-connectors-dui`**: `Connectors/Revit/Directory.Build.targets` and
-`Build/installer/BIMCostForRevit.iss` both resolve it as `../speckle-connectors-dui`, so
+`Build/installer/BIMStationForRevit.iss` both resolve it as `../speckle-connectors-dui`, so
 renaming it silently ships an installer with no panel.
 
 | Repo | Upstream | What we changed |
@@ -27,8 +28,21 @@ renaming it silently ships an installer with no panel.
 | `costrail-revit-plugin` | `specklesystems/speckle-sharp-connectors` | Addin manifests, ribbon, icons, telemetry removal, bundled-UI hosting, installer |
 | `costrail-connector-dui` | `specklesystems/speckle-connectors-dui` | Whole visual identity, debranding, removed update check and feedback |
 
-Both use the branch `bimcost/rebrand`, and both keep `upstream` as a second remote so
-Speckle's changes can be pulled in later.
+Both use the branch `bimcost/rebrand` (named before the rename to BIM Station), and both
+keep `upstream` as a second remote so Speckle's changes can be pulled in later.
+
+## Where it installs
+
+Per user, under `%AppData%\Autodesk\Revit\Addins\<ver>\`:
+
+- `BIMStation.Revit<ver>\` holds the assemblies and the `ui\` panel bundle
+- `BIMStation.Revit<ver>.addin` is the manifest
+
+The assemblies keep their upstream `Speckle.*` names, but the folder and manifest do not:
+upstream installs to `Speckle.Connectors.Revit<ver>`, and sharing that path would overwrite
+an installed official Speckle connector. The BIM Cost releases (1.0.x) did use that path;
+the installer removes the old folder on upgrade, but only when its manifest carries our
+`ClientId`.
 
 ## First-time setup on a new machine
 
@@ -78,8 +92,10 @@ and restart Revit.
 ## How the panel is served in production
 
 There is no web server in the installed plugin. `RevitControlWebView` maps the `ui/` folder
-next to the assembly onto `https://bimcost.app` using WebView2's
+next to the assembly onto `https://bimstation-panel.example` using WebView2's
 `SetVirtualHostNameToFolderMapping`, which gives a real https origin instead of `file://`.
+The host is deliberately not `bimstation.app`: that is the real web app, and the mapping
+would shadow it inside the panel. `.example` is reserved and can never resolve to a real site.
 
 Two consequences worth remembering:
 

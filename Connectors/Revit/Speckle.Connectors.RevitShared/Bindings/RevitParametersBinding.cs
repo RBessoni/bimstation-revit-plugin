@@ -84,7 +84,7 @@ internal sealed class RevitParametersBinding : IParametersBinding
       await _revitTask
         .RunAsync(() =>
         {
-          using var t = new Transaction(doc, "Speckle: Apply Parameter Changes");
+          using var t = new Transaction(doc, "BIM Station: Apply Parameter Changes");
 
           // silence pop-ups like "duplicate mark values" etc. which blocks our param updates
           var failureOptions = t.GetFailureHandlingOptions();

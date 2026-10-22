@@ -69,7 +69,7 @@ internal sealed class BasicConnectorBindingRevit : IBasicConnectorBinding
 
     if (doc.IsFamilyDocument)
     {
-      return new DocumentInfo("", "", "") { Message = "Family environment files not supported by Speckle." };
+      return new DocumentInfo("", "", "") { Message = "Family environment files not supported by BIM Station." };
     }
 
     //should this use the Hashcode of the document instead of something like CreationGUID?

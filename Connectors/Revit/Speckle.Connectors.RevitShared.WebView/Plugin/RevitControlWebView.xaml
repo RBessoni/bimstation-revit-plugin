@@ -12,7 +12,7 @@
   <Border Name="BrowserContainer" Background="White">
     <TextBlock
       Name="LoadingText"
-      Text="Loading Speckle..."
+      Text="Loading BIM Station..."
       HorizontalAlignment="Center"
       VerticalAlignment="Center"
       FontSize="14"

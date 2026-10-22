@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
   <AddIn Type="Application">
-    <Name>BIM Cost for Revit</Name>
-    <Description>BIM Cost for Revit</Description>
-    <Assembly>Speckle.Connectors.Revit2027\Speckle.Connectors.Revit2027.dll</Assembly>
+    <Name>BIM Station for Revit</Name>
+    <Description>BIM Station for Revit</Description>
+    <Assembly>BIMStation.Revit2027\Speckle.Connectors.Revit2027.dll</Assembly>
     <FullClassName>Speckle.Connectors.Revit.Plugin.RevitExternalApplication</FullClassName>
     <ClientId>8ae12a74-b713-4fe8-8183-8d10099a88ef</ClientId>
     <VendorId>blackbirdindustries</VendorId>
-    <VendorDescription>BIM Cost by Blackbird Industries &#8212; BIM quantity takeoff and cost estimation.</VendorDescription>
+    <VendorDescription>BIM Station by Blackbird Industries &#8212; BIM quantity takeoff and cost estimation.</VendorDescription>
   </AddIn>
 </RevitAddIns>
