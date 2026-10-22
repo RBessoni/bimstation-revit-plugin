@@ -280,7 +280,63 @@ public sealed class DisplayValueExtractor
       SortGeometry(element, collections, geom, worldToLocal);
     }
 
+    // BIM Station: conduit fittings behave like cable tray fittings (see OverrideViewOptions) —
+    // without a View, get_Geometry() ignores Options.DetailLevel and answers the coarse/medium
+    // single-line symbol: the elbow arrives as its centreline (Line + Arc + Line) and no body,
+    // even with the publish set to Fine. Seen on PEPSICO-TOLSMA-1227: 58 of 58 conduit fittings
+    // reached the server with no mesh. Retry through the active view ONLY when the first read
+    // produced no body — forcing the view path up front (the cable tray route) would drop a
+    // fitting entirely whenever it is hidden in the active view.
+    if (collections.Solids.Count == 0 && collections.Meshes.Count == 0 && IsViewDrivenFitting(element))
+    {
+      using DB.Options? viewOptions = TryActiveViewOptions();
+      if (viewOptions is null)
+      {
+        return collections;
+      }
+
+      DB.GeometryElement? viewGeom = null;
+      try
+      {
+        viewGeom = element.get_Geometry(viewOptions);
+      }
+      catch (Autodesk.Revit.Exceptions.ArgumentException)
+      {
+        // the element cannot be read through this view — keep what the first read produced
+      }
+
+      if (viewGeom != null && viewGeom.Any())
+      {
+        var viewCollections = new GeometryCollections();
+        SortGeometry(element, viewCollections, viewGeom, worldToLocal);
+        if (viewCollections.Solids.Count > 0 || viewCollections.Meshes.Count > 0)
+        {
+          return viewCollections;
+        }
+      }
+    }
+
     return collections;
+  }
+
+  private static bool IsViewDrivenFitting(DB.Element element) =>
+    element.Category?.GetBuiltInCategory() == DB.BuiltInCategory.OST_ConduitFitting;
+
+  /// <summary>
+  /// Options bound to the active view, or null where there is none (a linked document,
+  /// or no view open) — the caller then keeps what it already has.
+  /// </summary>
+  private DB.Options? TryActiveViewOptions()
+  {
+    try
+    {
+      DB.View? activeView = _converterSettings.Current.Document.NotNull().ActiveView;
+      return activeView is null ? null : new DB.Options { View = activeView };
+    }
+    catch (Exception ex) when (!ex.IsFatal())
+    {
+      return null;
+    }
   }
 
   /// <summary>
