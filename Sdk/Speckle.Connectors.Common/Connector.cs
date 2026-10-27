@@ -2,9 +2,11 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Speckle.Connectors.Common.Common;
+using Speckle.Connectors.Common.Credentials;
 using Speckle.Connectors.Logging;
 using Speckle.Objects.Geometry;
 using Speckle.Sdk;
+using Speckle.Sdk.Credentials;
 
 namespace Speckle.Connectors.Common;
 
@@ -36,6 +38,9 @@ public static class Connector
       assemblyVersion,
       typeof(Point).Assembly
     );
+    // BIM Station: our sign-in page instead of the SDK's "Speckle Connector" one. Registered after
+    // AddSpeckleSdk (which uses TryAdd) so this registration is the one that resolves.
+    serviceCollection.AddTransient<IAuthFlow, BimStationAuthFlow>();
 
     return serviceCollection.AddOpenTelemetry(
       "Connector",

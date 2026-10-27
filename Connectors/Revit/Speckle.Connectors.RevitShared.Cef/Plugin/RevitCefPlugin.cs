@@ -93,9 +93,9 @@ internal sealed class RevitCefPlugin : IRevitPlugin
       $"Speckle.Connectors.Revit{_speckleApplication.HostApplicationVersion}.Assets.logo32.png",
       path
     );
-    dui3Button.ToolTip = "Speckle for Revit";
+    dui3Button.ToolTip = "BIM Station for Revit";
     //dui3Button.AvailabilityClassName = typeof(CmdAvailabilityViews).FullName;
-    dui3Button.SetContextualHelp(new ContextualHelp(ContextualHelpType.Url, "https://speckle.systems"));
+    dui3Button.SetContextualHelp(new ContextualHelp(ContextualHelpType.Url, "https://bimstation.app"));
   }
 
   private void OnApplicationInitialized(object? sender, Autodesk.Revit.DB.Events.ApplicationInitializedEventArgs e)
@@ -158,7 +158,7 @@ internal sealed class RevitCefPlugin : IRevitPlugin
     // Otherwise pane cannot be registered for double-click file open.
     _uIControlledApplication.RegisterDockablePane(
       RevitExternalApplication.DockablePanelId,
-      "Speckle for Revit",
+      "BIM Station for Revit",
       _cefSharpPanel
     );
   }

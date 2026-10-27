@@ -170,7 +170,7 @@ public sealed class GlobalConfig
   /// The Url of the speckle server which the UI will handle as "default".
   /// </summary>
   /// <remarks>
-  /// Will be <c>https://app.speckle.systems</c> for most installations,
+  /// Will be <c>https://bimstation.app</c> for most installations,
   /// but we allow self hosters (e.g. enterprise self hosters) to override with their own URL
   /// </remarks>
   public Uri DefaultSpeckleServerUrl { get; init; }

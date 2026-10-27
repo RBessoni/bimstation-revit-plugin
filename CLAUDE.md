@@ -133,8 +133,23 @@ has it removed. Check this after every upstream merge.
 
 **The debranding boundary.** Remove *visual* Speckle references — names, logos, docs links,
 promo blocks, the update checker. Keep *functional* ones: adding an account still downloads
-Speckle's Desktop Service, and `GetDefaultSpeckleServerUrl()` still falls back to
-`app.speckle.systems`. Breaking those breaks sign-in. Do not "fix" them.
+Speckle's Desktop Service. Do not "fix" that.
+
+**Sign-in always targets `https://bimstation.app`.** Since 2026-10-27 `GetDefaultSpeckleServerUrl()`
+falls back to it (not `app.speckle.systems`), and the panel has no server field: users only pick
+their account. The browser sign-in opens `{server}/authn/verify/connectrV3/{challenge}` (the
+SDK's `AuthApp.ConnectorsV3`; callback `http://localhost:29355`), which bimstation.app serves
+(`sdui` 404s there, so the panel's own non-binding flow would not work).
+
+**The sign-in success page is ours.** The SDK's `AuthFlow` hardcodes a page saying "Your Speckle
+Connector is now authorized". `Sdk/Speckle.Connectors.Common/Credentials/BimStationAuthFlow.cs`
+reimplements the flow with a BIM Station page and is registered over the SDK's `IAuthFlow` in
+`Connector.Initialize` (the SDK registers with `TryAdd`, so ours must come after). Token refresh
+still goes to the SDK. When bumping `Speckle.Sdk`, diff its `Credentials/AuthFlow.cs` (tag =
+package version on github.com/specklesystems/speckle-sharp-sdk) against our copy.
+`SPECKLE_DEFAULT_SPECKLE_SERVER_URL` (env, then HKLM, then HKCU under
+`Software\Speckle\Connector Config\Global`) still overrides it, which is how you point a dev
+machine at a local server. Never take upstream's `app.speckle.systems` fallback in a merge.
 
 ## Which server the plugin actually talks to
 
@@ -144,8 +159,9 @@ domain 301-redirects pages and unknown routes to the canonical `https://bimstati
 the routes the connector uses (`/graphql`, `/api/diff`, `/objects`, `/api/getobjects`) still
 answer directly on the old domain. If it is ever retired, publishing stops. It reports
 version `2.31.14` but speaks the **v3 API** (`project` resolves, `stream` does not), so the
-connector is API-compatible with it. The Speckle URL in the config is only a default that
-the account overrides.
+connector is API-compatible with it. The same API answers on `https://bimstation.app` (its
+`serverInfo.canonicalUrl`), which is where new accounts are created; accounts made earlier on
+the old domain keep working against it.
 
 That server is a separate codebase in a separate environment, and it is where publish
 failures usually live. Before blaming the connector, probe it:

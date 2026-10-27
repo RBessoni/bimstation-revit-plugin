@@ -35,7 +35,8 @@ public class GlobalConfigResolver(ILogger<IGlobalConfigResolver> logger) : IGlob
       logger.LogWarning("Failed to parse {Key} '{Value}'", KEY, value);
     }
 
-    return new Uri("https://app.speckle.systems", UriKind.Absolute);
+    // BIM Station: accounts are always created on our own server
+    return new Uri("https://bimstation.app", UriKind.Absolute);
   }
 
   public Uri GetDuiUrl()
