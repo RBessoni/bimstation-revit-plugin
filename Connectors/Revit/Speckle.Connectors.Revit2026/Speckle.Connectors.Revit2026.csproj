@@ -5,6 +5,10 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <UseWpf>true</UseWpf>
     <RevitVersion>2026</RevitVersion>
+    <!-- BIM Station: Revit shows this file name in its add-in security dialog. RootNamespace keeps
+         the embedded resource names (Speckle.Connectors.Revit2026.Assets.*) the ribbon icons load. -->
+    <AssemblyName>BIMStation.Revit2026</AssemblyName>
+    <RootNamespace>Speckle.Connectors.Revit2026</RootNamespace>
     <DefineConstants>$(DefineConstants);REVIT2026;REVIT2023_OR_GREATER;REVIT2024_OR_GREATER;REVIT2025_OR_GREATER;REVIT2026_OR_GREATER</DefineConstants>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>

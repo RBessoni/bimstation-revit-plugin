@@ -3,7 +3,8 @@
   <!--
     BIM Station installs into its own Addins folder and manifest (BIMStation.Revit<ver>) rather
     than upstream's Speckle.Connectors.Revit<ver>, so it never overwrites an installed official
-    Speckle connector. The assemblies keep their Speckle.* names; only the install location moves.
+    Speckle connector. The entry assembly is BIMStation.Revit<ver>.dll (set in each Revit<ver>
+    csproj) because Revit shows its name; the other assemblies keep their Speckle.* names.
   -->
   <PropertyGroup Condition="'$(RevitVersion)' != ''">
     <BimStationAddinName>BIMStation.Revit$(RevitVersion)</BimStationAddinName>

@@ -71,6 +71,12 @@ Source: "{#UiDir}\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2027\{#Addin
 Source: "{#Out2027}\Plugin\Speckle.Connectors.Revit2027.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2027"; \
   DestName: "{#Addin2027}.addin"; Flags: ignoreversion; Components: r2027
 
+[InstallDelete]
+; Before 2026-10-27 the entry assembly was named Speckle.Connectors.Revit<ver>; an upgrade
+; would leave that copy next to the renamed BIMStation.Revit<ver>.dll.
+Type: files; Name: "{userappdata}\Autodesk\Revit\Addins\2026\{#Addin2026}\Speckle.Connectors.Revit2026.*"
+Type: files; Name: "{userappdata}\Autodesk\Revit\Addins\2027\{#Addin2027}\Speckle.Connectors.Revit2027.*"
+
 [UninstallDelete]
 Type: filesandordirs; Name: "{userappdata}\Autodesk\Revit\Addins\2026\{#Addin2026}"
 Type: filesandordirs; Name: "{userappdata}\Autodesk\Revit\Addins\2027\{#Addin2027}"

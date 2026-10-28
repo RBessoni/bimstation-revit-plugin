@@ -5,6 +5,10 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <UseWpf>true</UseWpf>
     <RevitVersion>2027</RevitVersion>
+    <!-- BIM Station: Revit shows this file name in its add-in security dialog. RootNamespace keeps
+         the embedded resource names (Speckle.Connectors.Revit2027.Assets.*) the ribbon icons load. -->
+    <AssemblyName>BIMStation.Revit2027</AssemblyName>
+    <RootNamespace>Speckle.Connectors.Revit2027</RootNamespace>
     <DefineConstants>$(DefineConstants);REVIT2027;REVIT2023_OR_GREATER;REVIT2024_OR_GREATER;REVIT2025_OR_GREATER;REVIT2026_OR_GREATER;REVIT2027_OR_GREATER</DefineConstants>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>

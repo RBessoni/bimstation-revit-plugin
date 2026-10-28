@@ -3,7 +3,7 @@
   <AddIn Type="Application">
     <Name>BIM Station for Revit</Name>
     <Description>BIM Station for Revit</Description>
-    <Assembly>BIMStation.Revit2027\Speckle.Connectors.Revit2027.dll</Assembly>
+    <Assembly>BIMStation.Revit2027\BIMStation.Revit2027.dll</Assembly>
     <FullClassName>Speckle.Connectors.Revit.Plugin.RevitExternalApplication</FullClassName>
     <ClientId>8ae12a74-b713-4fe8-8183-8d10099a88ef</ClientId>
     <VendorId>blackbirdindustries</VendorId>

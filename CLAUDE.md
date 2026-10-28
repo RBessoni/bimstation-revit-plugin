@@ -119,9 +119,16 @@ one fails to load. Never take upstream's values in a merge.
 `Directory.Build.targets` and the `.iss`; the source manifests keep upstream's file names.
 Upstream's `Speckle.Connectors.Revit<ver>` is the official connector's path, so a merge
 that restores it makes our installer overwrite Speckle. The `.addin` `<Assembly>` path must
-match the folder. Assembly names, namespaces and the embedded icon resource names
-(`Speckle.Connectors.Revit<ver>.Assets.logo16.png`) stay `Speckle.*` — renaming them breaks
-the ribbon icons silently and every upstream merge.
+match the folder and file.
+
+**The entry DLL is `BIMStation.Revit<ver>.dll`** (since 2026-10-27), because Revit's "Unsigned
+Add-In" security dialog shows its path. Each `Speckle.Connectors.Revit<ver>.csproj` sets
+`AssemblyName` to it **and** pins `RootNamespace` to `Speckle.Connectors.Revit<ver>`: the embedded
+icon resources are named from `RootNamespace` (`Speckle.Connectors.Revit<ver>.Assets.logo16.png`)
+and the ribbon loads them by that string, so dropping the `RootNamespace` line breaks the icons
+silently. The `.addin` `<Assembly>` points at the new file, and the `.iss` `[InstallDelete]`
+removes the old `Speckle.Connectors.Revit<ver>.*` left by earlier installs. Every other
+assembly name and all namespaces stay `Speckle.*` — renaming those breaks every upstream merge.
 
 **Shared parameters stay in the "Speckle" group.** `RevitParameterCreator` writes to
 `%AppData%\Speckle\SpeckleSharedParameters.txt`, group `Speckle`. Renaming either creates
