@@ -13,7 +13,7 @@ lives in a separate repo, cloned as a sibling:
 ```
 <parent>/
 ├── <this repo>/                  ← C# connector, installer, Revit integration
-└── speckle-connectors-dui/       ← the panel UI (repo: RBessoni/costrail-connector-dui)
+└── speckle-connectors-dui/       ← the panel UI (repo: RBessoni/bimstation-connector-dui)
 ```
 
 If a request is about how the panel *looks* or *reads* — colours, copy, buttons, layout —
@@ -22,15 +22,18 @@ text will find nothing.
 
 The UI folder **must** be named `speckle-connectors-dui`. `Connectors/Revit/Directory.Build.targets`
 and `Build/installer/BIMStationForRevit.iss` resolve it by relative path. A plain `git clone`
-of the fork produces `costrail-connector-dui` and the build then ships an installer with no
+of the fork produces `bimstation-connector-dui` and the build then ships an installer with no
 panel, silently and with no error.
 
 ## Both repos
 
 | | Repo | Upstream | Branch |
 | --- | --- | --- | --- |
-| C# | `RBessoni/costrail-revit-plugin` | `specklesystems/speckle-sharp-connectors` | `bimcost/rebrand` |
-| UI | `RBessoni/costrail-connector-dui` | `specklesystems/speckle-connectors-dui` | `bimcost/rebrand` |
+| C# | `RBessoni/bimstation-revit-plugin` | `specklesystems/speckle-sharp-connectors` | `bimcost/rebrand` |
+| UI | `RBessoni/bimstation-connector-dui` | `specklesystems/speckle-connectors-dui` | `bimcost/rebrand` |
+
+Both were renamed from `costrail-*` on GitHub (2026-10). The old URLs still redirect, but a
+clone's `origin` should point at the `bimstation-*` names (`git remote set-url origin ...`).
 
 Both keep `upstream` as a second remote with **push disabled** (`DISABLED_use_origin`).
 Never re-enable it. Pull upstream changes with `git fetch upstream && git merge upstream/dev`

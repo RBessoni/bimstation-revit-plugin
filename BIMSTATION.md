@@ -14,7 +14,7 @@ next to each other, with these exact folder names:
 
 ```
 <any parent folder>/
-├── costrail-revit-plugin/        ← this repo (C# connector + installer)
+├── bimstation-revit-plugin/        ← this repo (C# connector + installer)
 └── speckle-connectors-dui/       ← the panel UI (Nuxt 3)
 ```
 
@@ -25,8 +25,8 @@ renaming it silently ships an installer with no panel.
 
 | Repo | Upstream | What we changed |
 | --- | --- | --- |
-| `costrail-revit-plugin` | `specklesystems/speckle-sharp-connectors` | Addin manifests, ribbon, icons, telemetry removal, bundled-UI hosting, installer |
-| `costrail-connector-dui` | `specklesystems/speckle-connectors-dui` | Whole visual identity, debranding, removed update check and feedback |
+| `bimstation-revit-plugin` | `specklesystems/speckle-sharp-connectors` | Addin manifests, ribbon, icons, telemetry removal, bundled-UI hosting, installer |
+| `bimstation-connector-dui` | `specklesystems/speckle-connectors-dui` | Whole visual identity, debranding, removed update check and feedback |
 
 Both use the branch `bimcost/rebrand` (named before the rename to BIM Station), and both
 keep `upstream` as a second remote so Speckle's changes can be pulled in later.
@@ -47,8 +47,8 @@ the installer removes the old folder on upgrade, but only when its manifest carr
 ## First-time setup on a new machine
 
 ```powershell
-git clone https://github.com/RBessoni/costrail-revit-plugin.git
-git clone https://github.com/RBessoni/costrail-connector-dui.git speckle-connectors-dui
+git clone https://github.com/RBessoni/bimstation-revit-plugin.git
+git clone https://github.com/RBessoni/bimstation-connector-dui.git speckle-connectors-dui
 
 winget install --id Microsoft.DotNet.SDK.10
 winget install --id OpenJS.NodeJS.LTS
@@ -64,7 +64,7 @@ Node ships Corepack, which provides the Yarn version the UI pins — no separate
 ## Building the installer
 
 ```powershell
-cd costrail-revit-plugin
+cd bimstation-revit-plugin
 .\Build\build-installer.ps1
 ```
 
